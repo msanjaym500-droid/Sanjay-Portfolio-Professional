@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import {
   Mail,
   Phone,
@@ -12,7 +11,6 @@ import {
   Check,
   ExternalLink,
   Clock,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react';

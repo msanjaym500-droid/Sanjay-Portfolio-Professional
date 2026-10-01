@@ -4,16 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Play,
-  RotateCcw,
   CheckCircle,
   ExternalLink,
-  Code2,
-  Terminal,
-  Layers,
-  Sparkles,
-  FileText,
-  Sliders,
-  FolderOpen,
 } from 'lucide-react';
 
 export interface ProjectData {

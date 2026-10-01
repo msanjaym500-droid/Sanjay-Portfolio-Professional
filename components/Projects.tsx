@@ -3,14 +3,11 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import {
-  ExternalLink,
   Code2,
   Atom,
   Terminal,
-  Calendar,
   Sparkles,
   Layers,
-  ArrowUpRight,
   Eye,
   CheckCircle2,
 } from 'lucide-react';

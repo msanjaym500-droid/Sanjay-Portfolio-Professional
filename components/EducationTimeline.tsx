@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { GraduationCap, Calendar, MapPin, BookOpen, Award, CheckCircle } from 'lucide-react';
+import { GraduationCap, Calendar, MapPin, BookOpen } from 'lucide-react';
 
 export function EducationTimeline() {
   const academicMilestones = [

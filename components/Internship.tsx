@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   Terminal,
   FileCode2,
-  Sparkles,
   Copy,
   Check,
 } from 'lucide-react';
@@ -191,7 +190,7 @@ if __name__ == '__main__':
                 <button
                   onClick={handleCopyCode}
                   type="button"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-700/60 hover:bg-slate-700 text-slate-200 text-[11px] transition-colors"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-700/60 hover:bg-slate-700 text-slate-200 text-[11px] transition-colors cursor-pointer"
                 >
                   {copiedCode ? (
                     <>

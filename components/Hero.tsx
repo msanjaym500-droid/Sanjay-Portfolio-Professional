@@ -10,7 +10,6 @@ import {
   MapPin,
   GraduationCap,
   Sparkles,
-  Code2,
   Terminal,
   Atom,
   Camera,
@@ -21,7 +20,6 @@ import {
   KeyRound,
   AlertCircle,
   X,
-  CheckCircle2,
   Eye,
   EyeOff,
 } from 'lucide-react';
@@ -373,7 +371,7 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
                         }
                       }}
                       className="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-medium gap-1 rounded-[14px] cursor-pointer"
-                      title={isPhotoSessionUnlocked ? 'Click to change photo' : 'PIN locked. Click to enter PIN (6666)'}
+                      title={isPhotoSessionUnlocked ? 'Click to change photo' : 'Photo editing is locked. Click to enter PIN'}
                     >
                       {isPhotoSessionUnlocked ? (
                         <>
@@ -533,7 +531,7 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
                   Unlock Photo Controls
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-                  Enter your 4-digit security PIN (<span className="font-mono font-semibold text-slate-700 dark:text-slate-300">6666</span>) to upload or clear your profile photo.
+                  Enter your 4-digit security PIN to upload or clear your profile photo.
                 </p>
               </div>
 

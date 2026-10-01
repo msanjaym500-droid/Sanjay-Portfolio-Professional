@@ -314,8 +314,8 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Close modal"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              aria-label="Close resume modal"
             >
               <X className="w-5 h-5" />
             </button>

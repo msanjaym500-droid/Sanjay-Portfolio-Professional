@@ -8,11 +8,6 @@ import {
   FileText,
   Mail,
   Phone,
-  Linkedin,
-  MapPin,
-  Calendar,
-  GraduationCap,
-  Sparkles,
 } from 'lucide-react';
 
 interface RecruiterBriefModalProps {
@@ -183,7 +178,7 @@ export function RecruiterBriefModal({
                 onOpenResume();
               }}
               type="button"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Open Full ATS Resume →</span>
