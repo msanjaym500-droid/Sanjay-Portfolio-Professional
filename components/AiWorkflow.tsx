@@ -12,7 +12,6 @@ import {
   PenTool,
   Calendar,
   CheckCircle,
-  HelpCircle,
   ShieldCheck,
 } from 'lucide-react';
 

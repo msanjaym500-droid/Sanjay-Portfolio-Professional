@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useIsMounted } from '@/hooks/use-mounted';
 import {
   FileText,
@@ -16,6 +16,14 @@ import {
   Camera,
   Trash2,
   Upload,
+  Lock,
+  Unlock,
+  KeyRound,
+  AlertCircle,
+  X,
+  CheckCircle2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 interface HeroProps {
@@ -36,9 +44,68 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
     return null;
   });
 
+  // Photo Session Lock State (Protected by 4-digit PIN: 6666)
+  const [isPhotoSessionUnlocked, setIsPhotoSessionUnlocked] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [showPinDigits, setShowPinDigits] = useState(false);
+  const pinInputRef = useRef<HTMLInputElement | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Close PIN modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isPinModalOpen) {
+        setIsPinModalOpen(false);
+        setPinError('');
+        setPinInput('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPinModalOpen]);
+
+  // Focus PIN input when modal opens
+  useEffect(() => {
+    if (isPinModalOpen) {
+      setTimeout(() => {
+        pinInputRef.current?.focus();
+      }, 50);
+    }
+  }, [isPinModalOpen]);
+
+  const handleOpenPinModal = () => {
+    setPinError('');
+    setPinInput('');
+    setIsPinModalOpen(true);
+  };
+
+  const handleVerifyPin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pinInput.trim() === '6666') {
+      setIsPhotoSessionUnlocked(true);
+      setIsPinModalOpen(false);
+      setPinError('');
+      setPinInput('');
+    } else {
+      setPinError('Incorrect pin');
+    }
+  };
+
+  const handleLockSession = () => {
+    setIsPhotoSessionUnlocked(false);
+    setPinInput('');
+    setPinError('');
+  };
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isPhotoSessionUnlocked) {
+      handleOpenPinModal();
+      return;
+    }
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -97,6 +164,11 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
   };
 
   const handleClearPhoto = () => {
+    if (!isPhotoSessionUnlocked) {
+      handleOpenPinModal();
+      return;
+    }
+
     setProfilePhoto(null);
     try {
       localStorage.removeItem('sanjay_profile_photo');
@@ -180,7 +252,7 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
                 <span>Recruiter Quick Scan</span>
                 <button
                   onClick={onOpenRecruiterBrief}
-                  className="text-blue-600 dark:text-blue-400 hover:underline capitalize font-medium flex items-center gap-1"
+                  className="text-blue-600 dark:text-blue-400 hover:underline capitalize font-medium flex items-center gap-1 cursor-pointer"
                 >
                   View 60s summary →
                 </button>
@@ -235,7 +307,7 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
             </motion.div>
           </div>
 
-          {/* Right Column: Editorial Visual Identity Card with Photo Upload & Clear */}
+          {/* Right Column: Editorial Visual Identity Card with PIN-Protected Photo Upload & Clear */}
           <div className="lg:col-span-5 flex justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -290,40 +362,82 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
                       </>
                     )}
 
-                    {/* Quick Camera Hover Overlay */}
+                    {/* Quick Camera Hover Overlay (Opens PIN modal if locked, or file picker if unlocked) */}
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-medium gap-1 rounded-[14px] cursor-pointer"
-                      title="Click to upload profile photo"
+                      onClick={() => {
+                        if (!isPhotoSessionUnlocked) {
+                          handleOpenPinModal();
+                        } else {
+                          fileInputRef.current?.click();
+                        }
+                      }}
+                      className="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-medium gap-1 rounded-[14px] cursor-pointer"
+                      title={isPhotoSessionUnlocked ? 'Click to change photo' : 'PIN locked. Click to enter PIN (6666)'}
                     >
-                      <Camera className="w-5 h-5 text-white" />
-                      <span>Change Photo</span>
+                      {isPhotoSessionUnlocked ? (
+                        <>
+                          <Camera className="w-5 h-5 text-white" />
+                          <span>Change Photo</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-5 h-5 text-amber-400" />
+                          <span>Enter PIN to Edit</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
 
-                {/* Photo Upload & Clear Controls */}
+                {/* Photo Management Session Bar: Locked vs Unlocked */}
                 <div className="mt-3.5 flex items-center justify-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-900 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Upload className="w-3 h-3" />
-                    <span>Upload Photo</span>
-                  </button>
-
-                  {isMounted && profilePhoto && (
+                  {!isPhotoSessionUnlocked ? (
+                    /* LOCKED STATE: Button to enter 4-digit PIN */
                     <button
                       type="button"
-                      onClick={handleClearPhoto}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900 rounded-lg transition-colors cursor-pointer"
-                      title="Clear custom photo and restore default initials"
+                      onClick={handleOpenPinModal}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700/80 rounded-lg transition-colors cursor-pointer"
+                      title="Photo editing is locked. Click to enter 4-digit PIN."
                     >
-                      <Trash2 className="w-3 h-3" />
-                      <span>Clear</span>
+                      <Lock className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Unlock Photo Controls (PIN)</span>
                     </button>
+                  ) : (
+                    /* UNLOCKED STATE: Photo Upload and Clear Buttons are available */
+                    <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-900 rounded-lg transition-colors cursor-pointer"
+                        title="Upload new portrait photo"
+                      >
+                        <Upload className="w-3 h-3" />
+                        <span>Upload Photo</span>
+                      </button>
+
+                      {isMounted && profilePhoto && (
+                        <button
+                          type="button"
+                          onClick={handleClearPhoto}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900 rounded-lg transition-colors cursor-pointer"
+                          title="Clear custom photo and restore default initials"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Clear</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleLockSession}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 transition-colors cursor-pointer"
+                        title="Lock photo session again"
+                        aria-label="Lock photo session"
+                      >
+                        <Unlock className="w-3.5 h-3.5 text-emerald-500" />
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -372,6 +486,135 @@ export function Hero({ onOpenResume, onOpenRecruiterBrief }: HeroProps) {
           </div>
         </div>
       </div>
+
+      {/* 4-Digit PIN Security Unlock Modal (Required PIN: 6666) */}
+      <AnimatePresence>
+        {isPinModalOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pin-modal-title"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsPinModalOpen(false);
+                setPinError('');
+                setPinInput('');
+              }
+            }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-sm bg-white dark:bg-[#0c1220] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 overflow-hidden space-y-5"
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsPinModalOpen(false);
+                  setPinError('');
+                  setPinInput('');
+                }}
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close PIN modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Lock Header */}
+              <div className="text-center space-y-2 pt-2">
+                <div className="w-12 h-12 mx-auto rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
+                  <Lock className="w-6 h-6" />
+                </div>
+                <h3 id="pin-modal-title" className="text-base font-bold text-slate-900 dark:text-white">
+                  Unlock Photo Controls
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+                  Enter your 4-digit security PIN (<span className="font-mono font-semibold text-slate-700 dark:text-slate-300">6666</span>) to upload or clear your profile photo.
+                </p>
+              </div>
+
+              {/* PIN Entry Form */}
+              <form onSubmit={handleVerifyPin} className="space-y-4">
+                <div className="space-y-2">
+                  <div className="relative">
+                    <input
+                      ref={pinInputRef}
+                      type={showPinDigits ? 'text' : 'password'}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={4}
+                      autoComplete="off"
+                      placeholder="••••"
+                      value={pinInput}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                        setPinInput(val);
+                        if (pinError) setPinError('');
+                      }}
+                      className={`w-full py-3 px-4 text-center font-mono text-2xl tracking-[0.5em] rounded-xl border bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-all focus:outline-hidden focus:ring-2 ${
+                        pinError
+                          ? 'border-rose-500 focus:ring-rose-500 bg-rose-50/30 dark:bg-rose-950/20'
+                          : 'border-slate-300 dark:border-slate-700 focus:ring-blue-500'
+                      }`}
+                    />
+
+                    {/* Toggle show/hide PIN digits */}
+                    <button
+                      type="button"
+                      onClick={() => setShowPinDigits(!showPinDigits)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                      title={showPinDigits ? 'Hide PIN' : 'Show PIN'}
+                      aria-label="Toggle PIN visibility"
+                    >
+                      {showPinDigits ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Explicit Error Message: "Incorrect pin" */}
+                  {pinError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 pt-1"
+                    >
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{pinError}</span>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Form Buttons */}
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPinModalOpen(false);
+                      setPinError('');
+                      setPinInput('');
+                    }}
+                    className="flex-1 py-2 px-3 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={pinInput.length < 4}
+                    className="flex-1 py-2 px-3 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>Unlock</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

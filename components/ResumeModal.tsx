@@ -273,6 +273,9 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="resume-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
     >
       <div className="relative w-full max-w-4xl bg-white dark:bg-[#0c1220] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">

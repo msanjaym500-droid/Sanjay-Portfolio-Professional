@@ -67,7 +67,7 @@ export function Strengths() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-[#090e1a]/50 border-y border-slate-200/60 dark:border-slate-800/60">
+    <section id="strengths" className="py-20 md:py-28 relative bg-slate-50/50 dark:bg-[#090e1a]/50 border-y border-slate-200/60 dark:border-slate-800/60">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl space-y-3 mb-12">

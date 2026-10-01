@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Target, Compass, Brain, Sparkles, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Target, Brain, Sparkles, BookOpen, CheckCircle2 } from 'lucide-react';
 
 export function About() {
   const pillars = [
